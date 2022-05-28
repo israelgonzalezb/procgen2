@@ -42,13 +42,17 @@ class BigFish : public BasicAbstractGame {
         }
     }
 
+            
     void handle_agent_collision(const std::shared_ptr<Entity> &obj) override {
         BasicAbstractGame::handle_agent_collision(obj);
 
+        
         if (obj->type == FISH) {
             if (obj->rx > agent->rx) {
+                // If agent collides with a bigger fish, game over
                 step_data.done = true;
             } else {
+                // If the fish is smaller or same size, agent eats it and grows
                 step_data.reward += POSITIVE_REWARD;
                 obj->will_erase = true;
                 agent->rx += r_inc;
@@ -61,16 +65,18 @@ class BigFish : public BasicAbstractGame {
     void game_reset() override {
         BasicAbstractGame::game_reset();
 
+
         options.center_agent = false;
+            r_inc = (FISH_MAX_R - start_r) / FISH_QUOTA;
         fish_eaten = 0;
 
         float start_r = .5;
 
         if (options.distribution_mode == EasyMode) {
+            // agent starts larger in easy mode
             start_r = 1;
         }
 
-        r_inc = (FISH_MAX_R - start_r) / FISH_QUOTA;
 
         agent->rx = start_r;
         agent->ry = start_r;
@@ -81,6 +87,7 @@ class BigFish : public BasicAbstractGame {
         BasicAbstractGame::game_step();
 
         if (rand_gen.randn(10) == 1) {
+            // new fish is added randomly
             float ent_r = (FISH_MAX_R - FISH_MIN_R) * pow(rand_gen.rand01(), 1.4) + FISH_MIN_R;
             float ent_y = rand_gen.rand01() * (main_height - 2 * ent_r);
             float moves_right = rand_gen.rand01() < .5;
@@ -94,14 +101,17 @@ class BigFish : public BasicAbstractGame {
         }
 
         if (fish_eaten >= FISH_QUOTA) {
+            // agent has eaten enough fish, game over
             step_data.done = true;
             step_data.reward += COMPLETION_BONUS;
             step_data.level_complete = true;
         }
 
-        if (action_vx > 0)
+        if (action_vx > 0) {
             agent->is_reflected = false;
-        if (action_vx < 0)
+        }
+        if (action_vx < 0) {
+        }
             agent->is_reflected = true;
     }
 
