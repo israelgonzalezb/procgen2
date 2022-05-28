@@ -67,7 +67,6 @@ class BigFish : public BasicAbstractGame {
 
 
         options.center_agent = false;
-            r_inc = (FISH_MAX_R - start_r) / FISH_QUOTA;
         fish_eaten = 0;
 
         float start_r = .5;
@@ -76,6 +75,8 @@ class BigFish : public BasicAbstractGame {
             // agent starts larger in easy mode
             start_r = 1;
         }
+      
+        r_inc = (FISH_MAX_R - start_r) / FISH_QUOTA;
 
 
         agent->rx = start_r;
