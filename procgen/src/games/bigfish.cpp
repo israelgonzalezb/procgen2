@@ -42,13 +42,13 @@ class BigFish : public BasicAbstractGame {
         }
     }
 
-            
+
     void handle_agent_collision(const std::shared_ptr<Entity> &obj) override {
         BasicAbstractGame::handle_agent_collision(obj);
 
         
         if (obj->type == FISH) {
-            if (obj->rx > agent->rx && obj->x > agent->x ) {
+            if (obj->rx > agent->rx) {
                 // If agent collides with a bigger fish, game over
                 step_data.done = true;
             } else {
@@ -58,6 +58,19 @@ class BigFish : public BasicAbstractGame {
                 agent->rx += r_inc;
                 agent->ry += r_inc;
                 fish_eaten += 1;
+                if (is_out_of_bounds(agent)) {
+                    // make sure agent doesn't get blocked if it grows out of bounds
+                    if (agent->x < 0) {
+                        agent->x = 0;
+                    } else if (agent->x > main_width) {
+                        agent->x = main_width;
+                    }
+                    if (agent->y < 0) {
+                        agent->y = 0;
+                    } else if (agent->y > main_height) {
+                        agent->y = main_height;
+                    }
+                }
             }
         }
     }
@@ -75,7 +88,7 @@ class BigFish : public BasicAbstractGame {
             // agent starts larger in easy mode
             start_r = 1;
         }
-      
+
         r_inc = (FISH_MAX_R - start_r) / FISH_QUOTA;
 
 
@@ -86,7 +99,7 @@ class BigFish : public BasicAbstractGame {
 
     void game_step() override {
         BasicAbstractGame::game_step();
-      
+
         // new fish is added randomly
         if (rand_gen.randn(10) == 1) {
             // new fish starts at random size
@@ -122,8 +135,8 @@ class BigFish : public BasicAbstractGame {
             agent->is_reflected = false;
         }
         if (action_vx < 0) {
-        }
             agent->is_reflected = true;
+        }
     }
 
     void serialize(WriteBuffer *b) override {
