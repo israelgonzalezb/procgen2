@@ -1,6 +1,6 @@
-**Status:** Maintenance (expect bug fixes and minor updates)
+# Procgen2: A maintained version of Procgen
 
-# Procgen Benchmark
+## Old readme Below
 
 #### [[Blog Post]](https://openai.com/blog/procgen-benchmark/) [[Paper]](https://arxiv.org/abs/1912.01588)
 
