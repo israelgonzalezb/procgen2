@@ -142,6 +142,18 @@ class CaveFlyerGame : public BasicAbstractGame {
         main_height = world_dim;
     }
 
+    static auto check_neighbors(const std::shared_ptr<Entity>& e1, const std::shared_ptr<Entity>& e2) {
+        float neighborhood = 2;
+        float epsilon = 0.001;
+        if (abs(e1->x - e2->x) <= epsilon && abs(e1->y - e2->y) <= neighborhood) {
+            return 1; // Collision if entities move in the Y-axis
+        }
+        if (abs(e1->x - e2->x) <= neighborhood && abs(e1->y - e2->y) <= epsilon) {
+            return 2; // Collision if entities move in the X-axis
+        }
+        return 0; // No Collision
+    }
+
     void game_reset() override {
         BasicAbstractGame::game_reset();
 
@@ -205,7 +217,6 @@ class CaveFlyerGame : public BasicAbstractGame {
 
         for (int iteration = 0; iteration < 4; iteration++) {
             room_manager->update();
-
             for (int i : goal_path) {
                 set_obj(i, SPACE);
             }
@@ -224,7 +235,6 @@ class CaveFlyerGame : public BasicAbstractGame {
                 set_obj(i, CAVEWALL);
             }
         }
-
         int chunk_size = ((int)(free_cells.size()) / 80);
         int num_objs = 3 * chunk_size;
 
@@ -243,9 +253,16 @@ class CaveFlyerGame : public BasicAbstractGame {
             } else {
                 auto e = spawn_entity_at_idx(val, .5, ENEMY);
                 float vel = (.1 * rand_gen.rand01() + .1) * (rand_gen.randn(2) * 2 - 1);
-                if (rand_gen.rand01() < .5) {
+                int collision = check_neighbors(e, agent);
+                if (collision == 0) {
+                    if (rand_gen.rand01() < .5) {
+                        e->vx = vel;
+                    } else {
+                        e->vy = vel;
+                    }
+                } else if (collision == 1) {
                     e->vx = vel;
-                } else {
+                } else if (collision == 2) {
                     e->vy = vel;
                 }
                 e->smart_step = true;
