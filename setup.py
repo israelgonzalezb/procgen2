@@ -102,7 +102,7 @@ setup(
         "gym3>=0.3.3,<1.0.0",
         "filelock>=3.0.0,<4.0.0",
     ],
-    python_requires=">=3.7, <3.11",,
+    python_requires=">=3.7, <3.11",
     package_data={
         "procgen2": [
             "version.txt",
