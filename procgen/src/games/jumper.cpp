@@ -297,7 +297,9 @@ class Jumper : public BasicAbstractGame {
             int y = i / main_width;
 
             if (is_space_on_ground(x, y)) {
-                agent_candidates.push_back(i);
+                if (i != goal_cell) { // Avoid to put agent and goal in same position
+                    agent_candidates.push_back(i);
+                }
             }
         }
 
@@ -357,10 +359,13 @@ class Jumper : public BasicAbstractGame {
 
         for (int spike_cell : spike_cells) {
             set_obj(spike_cell, SPACE);
-            float spike_ry = 0.4f;
-            float spike_rx = 0.23f;
+            if (spike_cell != agent_cell && spike_cell != goal_cell) { // Avoid placing spike in agent or goal position
+                float spike_ry = 0.4f;
+                float spike_rx = 0.23f;
 
-            add_entity_rxy((spike_cell % main_width) + .5, (spike_cell / main_width) + spike_ry, 0, 0, spike_rx, spike_ry, SPIKE);
+                add_entity_rxy((spike_cell % main_width) + .5, (spike_cell / main_width) + spike_ry, 0, 0, spike_rx,
+                               spike_ry, SPIKE);
+            }
         }
 
         for (int i = 0; i < grid_size; i++) {
