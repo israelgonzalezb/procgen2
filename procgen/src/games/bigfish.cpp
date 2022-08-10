@@ -15,6 +15,71 @@ const float FISH_MAX_R = 2;
 
 const int FISH_QUOTA = 30;
 
+/**
+### Description
+
+The player starts as a small fish and becomes bigger by eating other
+fish. The player may only eat fish smaller than itself, as determined
+solely by width. If the player comes in contact with a larger fish,
+the player is eaten and the episode ends. The player receives a small
+reward for eating a smaller fish and a large reward for becoming
+bigger than all other fish, at which point the episode ends.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move down-left  |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move up-left    |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move down-right |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move up-right   |
+| 9   | D            | Unused          |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+1` reward is given for each fish eaten.
+A further `+10` is assigned after succesfully completing one
+episode.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player is eaten (collide with a larger fish).
+2. The player is big enough to eat all the fish (reaches quota).
+3. Timeout is reached.
+
+### Known Issues
+
+It is possible for the player to occasionally become trapped
+along the borders of the environment.
+
+*/
+
 class BigFish : public BasicAbstractGame {
   public:
     int fish_eaten = 0;
