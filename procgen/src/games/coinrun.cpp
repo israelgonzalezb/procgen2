@@ -35,6 +35,62 @@ std::vector<std::string> GROUND_THEMES = {"Dirt", "Grass", "Planet", "Sand", "Sn
 
 const int NUM_GROUND_THEMES = (int)(GROUND_THEMES.size());
 
+/**
+### Description
+
+A simple platformer. The goal is to collect the coin at the far right 
+of the level, and the player spawns on the far left. The agent must 
+dodge stationary saw obstacles, enemies that pace back and forth, and 
+chasms that lead to death. Note that while the previously released 
+version of CoinRun painted velocity information directly onto 
+observations, the current version does not. This makes the 
+environment significantly more difficult.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press. 
+
+The different combos are:
+
+| Num | Combo        | Action              |
+|-----|--------------|---------------------|
+| 0   | LEFT + DOWN  | Move left           |
+| 1   | LEFT         | Move left           |
+| 2   | LEFT + UP    | Jump and move left  |
+| 3   | DOWN         | Unused              |
+| 4   |              | Do Nothing          |
+| 5   | UP           | Jump                |
+| 6   | RIGHT + DOWN | Move right          |
+| 7   | RIGHT        | Move right          |
+| 8   | RIGHT + UP   | Jump and move right |
+| 9   | D            | Unused              |
+| 10  | A            | Unused              |
+| 11  | W            | Unused              |
+| 12  | S            | Unused              |
+| 13  | Q            | Unused              |
+| 14  | E            | Unused              |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent 
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the 
+observation space is a dictionary space where the pixels are under 
+the key "rgb".
+
+### Rewards
+
+A goal reward of `+10` is allotted when the player reaches the coin.
+
+### Termination
+
+The episode ends if any one of the following occurs:
+
+1. The player collides either with an enemy or a saw
+2. The player falls into lava
+3. The player reaches the coin
+*/
 class CoinRun : public BasicAbstractGame {
   public:
     std::shared_ptr<Entity> goal;
