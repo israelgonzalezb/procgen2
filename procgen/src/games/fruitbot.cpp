@@ -22,6 +22,65 @@ const int KEY_DURATION = 8;
 
 const float DOOR_ASPECT_RATIO = 3.25;
 
+/**
+### Description
+
+A scrolling game where the player controls a robot that must navigate 
+between gaps in walls and collect fruit along the way. The player 
+receives a positive reward for collecting a piece of fruit, and a 
+larger negative reward for mistakenly collecting a non-fruit object. 
+Half of the spawned objects are fruit (positive reward) and half are 
+non-fruit (negative reward). The player receives a large reward if 
+they reach the end of the level. Occasionally the player must use a 
+key to unlock gates which block the way.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press. 
+
+The different combos are:
+
+| Num | Combo        | Action     |
+|-----|--------------|------------|
+| 0   | LEFT + DOWN  | Move left  |
+| 1   | LEFT         | Move left  |
+| 2   | LEFT + UP    | Move left  |
+| 3   | DOWN         | Unused     |
+| 4   |              | Do nothing |
+| 5   | UP           | Unused     |
+| 6   | RIGHT + DOWN | Move right |
+| 7   | RIGHT        | Move right |
+| 8   | RIGHT + UP   | Move right |
+| 9   | D            | Throw key  |
+| 10  | A            | Unused     |
+| 11  | W            | Unused     |
+| 12  | S            | Unused     |
+| 13  | Q            | Unused     |
+| 14  | E            | Unused     |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent 
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the 
+observation space is a dictionary space where the pixels are under 
+the key "rgb".
+
+### Rewards
+
+The player gets a `+1` reward for each fruit collected and a 
+pentalty of `-4` for each non-fruit. If the goal is reached the 
+reward is `+10`.
+
+### Termination
+
+The episode ends if the player collides with one of the following:
+
+1. A barrier
+2. A locked door
+3. The end of the level
+*/
 class FruitBotGame : public BasicAbstractGame {
   public:
     float min_dim = 0.0f;
