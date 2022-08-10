@@ -29,6 +29,71 @@ const int BOTTOM_MARGIN = 6;
 const int BOSS_VEL_TIMEOUT = 20;
 const int BOSS_DAMAGED_TIMEOUT = 40;
 
+/**
+### Description
+
+The player controls a small starship and must destroy a much bigger
+boss starship. The boss randomly selects from a set of possible
+attacks when engaging the player. The player must dodge the incoming
+projectiles or be destroyed. The player can also use randomly
+scattered meteors for cover. After a set timeout, the boss becomes
+vulnerable and its shields go down. At this point, the players
+projectile attacks will damage the boss. Once the boss receives a
+certain amount of damage, the player receives a reward, and the boss
+re-raises its shields. If the player damages the boss several times
+in this way, the boss is destroyed, the player receives a large
+reward, and the episode ends.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move down-left  |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move up-left    |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move down-right |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move up-right   |
+| 9   | D            | Fire            |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+1` reward is given for each time a certain ammount of damage is
+dealt to the boss.
+A further `+10` is assigned after succesfully defeating the boss.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player is hit.
+2. The player defeats the boss.
+3. Timeout is reached.
+
+*/
+
 class BossfightGame : public BasicAbstractGame {
   public:
     std::shared_ptr<Entity> boss, shields;
