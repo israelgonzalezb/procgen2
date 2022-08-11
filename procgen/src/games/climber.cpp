@@ -26,6 +26,60 @@ const float PATROL_RANGE = 4;
 
 const int NUM_WALL_THEMES = 4;
 
+/**
+### Description
+
+A simple platformer. The player must climb a sequence of platforms, 
+collecting stars along the way. A small reward is given for 
+collecting a star, and a larger reward is given for collecting all 
+stars in a level. If all stars are collected, the episode ends. There 
+are lethal flying monsters scattered throughout the level.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press. 
+
+The different combos are:
+
+| Num | Combo        | Action              |
+|-----|--------------|---------------------|
+| 0   | LEFT + DOWN  | Move left           |
+| 1   | LEFT         | Move left           |
+| 2   | LEFT + UP    | Jump and move left  |
+| 3   | DOWN         | Unused              |
+| 4   |              | Do Nothing          |
+| 5   | UP           | Jump                |
+| 6   | RIGHT + DOWN | Move right          |
+| 7   | RIGHT        | Move right          |
+| 8   | RIGHT + UP   | Jump and move right |
+| 9   | D            | Unused              |
+| 10  | A            | Unused              |
+| 11  | W            | Unused              |
+| 12  | S            | Unused              |
+| 13  | Q            | Unused              |
+| 14  | E            | Unused              |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent 
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the 
+observation space is a dictionary space where the pixels are under 
+the key "rgb".
+
+### Rewards
+
+A reward of `+1` is allotted for every collected star. If all the 
+stars are collected, a completion bonus of `+10` is given.
+
+### Termination
+
+The episode ends if any one of the following occurs:
+
+1. All the coins are collected
+2. The player collides with an enemy
+*/
 class Climber : public BasicAbstractGame {
   public:
     bool has_support = false;
