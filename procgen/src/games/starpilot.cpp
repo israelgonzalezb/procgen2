@@ -29,6 +29,67 @@ bool spawn_cmp(const std::shared_ptr<Entity> &x, const std::shared_ptr<Entity> &
     return (x->spawn_time > y->spawn_time);
 }
 
+/**
+### Description
+
+A simple side scrolling shooter game. Relatively challenging for humans to play
+since all enemies fire projectiles that directly target the player. An inability
+to dodge quickly leads to the player's demise. There are fast and slow enemies, 
+stationary turrets with high health, clouds which obscure player vision, and
+impassable meteors.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move down-left  |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move up-left    |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move down-right |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move up-right   |
+| 9   | D            | Fire front      |
+| 10  | A            | Fire back       |
+| 11  | W            | Fire front      |
+| 12  | S            | Fire front      |
+| 13  | Q            | Fire front      |
+| 14  | E            | Fire front      |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+1` reward is given for each spaceship destroyed.
+A further `+10` is assigned after succesfully completing one
+episode by reaching the finish line.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player is hit by a projectile.
+2. The player collide with an enemy.
+3. The player collide with a meteor.
+4. The player reaches the finish line.
+5. Timeout is reached.
+
+*/
+
 class StarPilotGame : public BasicAbstractGame {
   public:
     std::vector<std::shared_ptr<Entity>> spawners;
