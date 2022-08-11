@@ -18,6 +18,72 @@ const int DIRT = 9;
 
 const int OOB_WALL = 10;
 
+/**
+### Description
+
+Inspired by the classic game “BoulderDash”. The player, a robot, can dig through
+dirt to move throughout the world. The world has gravity, and dirt supports
+boulders and diamonds. Boulders and diamonds will fall through free space and
+roll off each other. If a boulder or a diamond falls on the player, the game is
+over. The goal is to collect all the diamonds in the level and then proceed
+through the exit. The player receives a small reward for collecting a diamond
+and a larger reward for completing the level.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move down-left  |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move up-left    |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move down-right |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move up-right   |
+| 9   | D            | Unused          |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+1` reward is given for each diamond collected.
+A further `+10` is assigned after succesfully completing one
+episode.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player reach the exit with collecting all the diamonds.
+2. The player lose by getting crushed by a boulder or a diamond.
+3. Timeout is reached.
+
+### Known Issues
+
+There is a low probability of unsolvable level configurations, with either a 
+diamond or the exit being unreachable.
+
+*/
+
 class MinerGame : public BasicAbstractGame {
   public:
     int diamonds_remaining = 0;
