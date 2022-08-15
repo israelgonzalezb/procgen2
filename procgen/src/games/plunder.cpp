@@ -14,6 +14,68 @@ const int TARGET_BACKGROUND = 3;
 const int PANEL = 6;
 const int SHIP = 7;
 
+/**
+### Description
+
+The player must destroy enemy pirate ships by firing cannonballs from its own
+ship at the bottom of the screen. An on-screen timer slowly counts down. If this
+timer runs out, the episode ends. Whenever the player fires, the timer skips 
+forward a few steps, encouraging the player to conserve ammunition. The player 
+must take care to avoid hitting friendly ships. The player receives a positive 
+reward for hitting an enemy ship and a large timer penalty for hitting a 
+friendly ship. A target in the bottom left corner identifies the color of the 
+enemy ships to target.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move left       |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move left       |
+| 3   | DOWN         | Unused          |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Unused          |
+| 6   | RIGHT + DOWN | Move right      |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move right      |
+| 9   | D            | Fire            |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+1` reward is given for each enemy ship hit.
+A further `+10` is assigned after succesfully completing one
+episode by hitting enough enemy ships.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The timer runs out.
+2. The player hits enough enemy ships.
+3. Timeout is reached.
+
+*/
+
 class PlunderGame : public BasicAbstractGame {
   public:
     int last_fire_time = 0;
