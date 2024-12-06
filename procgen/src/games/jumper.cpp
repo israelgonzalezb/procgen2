@@ -26,6 +26,76 @@ const int MAZE_SCALE = 3;
 const int JUMP_COOLDOWN = 3;
 const int NUM_WALL_THEMES = 4;
 
+/**
+### Description
+
+A platformer with an open world layout. The player, a bunny, must
+navigate through the world to find the carrot. It might be necessary
+to ascend or descend the level to do so. The player is capable of
+“double jumping”, allowing it to navigate tricky layouts and reach
+high platforms. There are spike obstacles which will destroy the
+player on contact. The screen includes a compass which displays
+direction and distance to the carrot. The only reward in the game
+comes from collect the carrot, at which point the episode ends. Due
+to a bug that permits the player to spawn on top of critical objects
+(an obstacle or the goal), ~7% of levels will terminate after a single
+action, the vast majority of which will have 0 reward.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move left       |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Jump up-left    |
+| 3   | DOWN         | Unused          |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Jump            |
+| 6   | RIGHT + DOWN | Move right      |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Jump up-right   |
+| 9   | D            | Unused          |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+10` reward is assigned after succesfully completing one
+episode by collecting the carrot.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player is collides with a spike.
+2. The player collects the carrot.
+3. Timeout is reached.
+
+### Known Issues
+
+In ~7% of levels, the player will spawn on top of an enemy or the 
+goal, resulting in the episode terminating after a single step 
+regardless of which action is taken.
+
+*/
+
 class Jumper : public BasicAbstractGame {
   public:
     std::shared_ptr<Entity> goal;
@@ -297,7 +367,9 @@ class Jumper : public BasicAbstractGame {
             int y = i / main_width;
 
             if (is_space_on_ground(x, y)) {
-                agent_candidates.push_back(i);
+                if (i != goal_cell) { // Avoid to put agent and goal in same position
+                    agent_candidates.push_back(i);
+                }
             }
         }
 
@@ -357,10 +429,13 @@ class Jumper : public BasicAbstractGame {
 
         for (int spike_cell : spike_cells) {
             set_obj(spike_cell, SPACE);
-            float spike_ry = 0.4f;
-            float spike_rx = 0.23f;
+            if (spike_cell != agent_cell && spike_cell != goal_cell) { // Avoid placing spike in agent or goal position
+                float spike_ry = 0.4f;
+                float spike_rx = 0.23f;
 
-            add_entity_rxy((spike_cell % main_width) + .5, (spike_cell / main_width) + spike_ry, 0, 0, spike_rx, spike_ry, SPIKE);
+                add_entity_rxy((spike_cell % main_width) + .5, (spike_cell / main_width) + spike_ry, 0, 0, spike_rx,
+                               spike_ry, SPIKE);
+            }
         }
 
         for (int i = 0; i < grid_size; i++) {

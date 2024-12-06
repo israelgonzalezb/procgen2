@@ -7,7 +7,6 @@ import subprocess
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PACKAGE_ROOT = os.path.join(SCRIPT_DIR, "procgen")
-README = open(os.path.join(SCRIPT_DIR, "README.md"), "rb").read().decode("utf8")
 
 # dynamically determine version number based on git commit
 def determine_version():
@@ -82,8 +81,19 @@ class custom_build_ext(build_ext):
 asset_paths = glob.glob(os.path.join(PACKAGE_ROOT, "data", "**"), recursive=True)
 asset_relpaths = [os.path.relpath(path, PACKAGE_ROOT) for path in asset_paths]
 
+with open("README.md") as fh:
+    long_description = ""
+    header_count = 0
+    for line in fh:
+        if line.startswith("##"):
+            header_count += 1
+        if header_count < 2:
+            long_description += line
+        else:
+            break
+
 setup(
-    name="procgen",
+    name="procgen2",
     packages=find_packages(),
     version=version,
     install_requires=[
@@ -92,9 +102,9 @@ setup(
         "gym3>=0.3.3,<1.0.0",
         "filelock>=3.0.0,<4.0.0",
     ],
-    python_requires=">=3.6.0",
+    python_requires=">=3.7, <3.11",
     package_data={
-        "procgen": [
+        "procgen2": [
             "version.txt",
             *asset_relpaths,
         ]
@@ -102,10 +112,18 @@ setup(
     extras_require={"test": ["pytest==6.2.5", "pytest-benchmark==3.4.1"]},
     ext_modules=[DummyExtension()],
     cmdclass={"build_ext": custom_build_ext},
-
-    author="OpenAI",
+    author_email="jkterry@farama.org",
+    author="Farama Foundation",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+    ],
     description="Procedurally Generated Game-Like RL Environments",
-    long_description=README,
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/openai/procgen",
+    url="https://github.com/Farama-Foundation/procgen2",
 )

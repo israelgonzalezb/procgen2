@@ -19,6 +19,72 @@ const int EXHAUST = 9;
 
 const int MARKER = 1003;
 
+/**
+### Description
+
+The player must navigate a network of caves to reach the exit. Player 
+movement mimics the Atari game “Asteroids”: the ship can rotate and 
+travel forward or backward along the current axis. The majority of 
+the reward comes from successfully reaching the end of the level,
+though additional reward can be collected by destroying target 
+objects along the way with the ship's lasers. There are stationary 
+and moving lethal obstacles throughout the level.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action                         |
+|-----|--------------|--------------------------------|
+| 0   | LEFT + DOWN  | Rotate left while moving down  |
+| 1   | LEFT         | Rotate left                    |
+| 2   | LEFT + UP    | Rotate left while moving up    |
+| 3   | DOWN         | Move down                      |
+| 4   |              | Do Nothing                     |
+| 5   | UP           | Move up                        |
+| 6   | RIGHT + DOWN | Rotate right while moving down |
+| 7   | RIGHT        | Rotate right                   |
+| 8   | RIGHT + UP   | Rotate right while moving up   |
+| 9   | D            | Fire                           |
+| 10  | A            | Unused                         |
+| 11  | W            | Unused                         |
+| 12  | S            | Unused                         |
+| 13  | Q            | Unused                         |
+| 14  | E            | Unused                         |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+3` reward is given for each target destroyed.
+A further `+10` is assigned after succesfully completing one
+episode.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player reach the end of the level.
+2. The player collide with an obstacle.
+3. Timeout is reached.
+
+### Known Issues
+
+In ~0.5% of levels, the player spawns next to an enemy and will die in
+a single step regardless of which action is taken.
+
+*/
+
 class CaveFlyerGame : public BasicAbstractGame {
   public:
     std::unique_ptr<RoomGenerator> room_manager;
@@ -142,6 +208,18 @@ class CaveFlyerGame : public BasicAbstractGame {
         main_height = world_dim;
     }
 
+    static auto check_neighbors(const std::shared_ptr<Entity>& e1, const std::shared_ptr<Entity>& e2) {
+        float neighborhood = 2;
+        float epsilon = 0.001;
+        if (abs(e1->x - e2->x) <= epsilon && abs(e1->y - e2->y) <= neighborhood) {
+            return 1; // Collision if entities move in the Y-axis
+        }
+        if (abs(e1->x - e2->x) <= neighborhood && abs(e1->y - e2->y) <= epsilon) {
+            return 2; // Collision if entities move in the X-axis
+        }
+        return 0; // No Collision
+    }
+
     void game_reset() override {
         BasicAbstractGame::game_reset();
 
@@ -205,7 +283,6 @@ class CaveFlyerGame : public BasicAbstractGame {
 
         for (int iteration = 0; iteration < 4; iteration++) {
             room_manager->update();
-
             for (int i : goal_path) {
                 set_obj(i, SPACE);
             }
@@ -224,7 +301,6 @@ class CaveFlyerGame : public BasicAbstractGame {
                 set_obj(i, CAVEWALL);
             }
         }
-
         int chunk_size = ((int)(free_cells.size()) / 80);
         int num_objs = 3 * chunk_size;
 
@@ -243,9 +319,16 @@ class CaveFlyerGame : public BasicAbstractGame {
             } else {
                 auto e = spawn_entity_at_idx(val, .5, ENEMY);
                 float vel = (.1 * rand_gen.rand01() + .1) * (rand_gen.randn(2) * 2 - 1);
-                if (rand_gen.rand01() < .5) {
+                int collision = check_neighbors(e, agent);
+                if (collision == 0) {
+                    if (rand_gen.rand01() < .5) {
+                        e->vx = vel;
+                    } else {
+                        e->vy = vel;
+                    }
+                } else if (collision == 1) {
                     e->vx = vel;
-                } else {
+                } else if (collision == 2) {
                     e->vy = vel;
                 }
                 e->smart_step = true;

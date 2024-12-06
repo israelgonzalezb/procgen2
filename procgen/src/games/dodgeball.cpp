@@ -23,6 +23,65 @@ const int NUM_ENEMY_THEMES = 7;
 const float ENEMY_VEL = 0.05f;
 const float BALL_V_ROT = PI * 0.23f;
 
+/**
+### Description
+
+Loosely inspired by the Atari game “Berzerk”. The player spawns in a 
+room with a random configuration of walls and enemies. Touching a 
+wall loses the game and ends the episode. The player moves relatively 
+slowly and can navigate throughout the room. There are enemies which 
+also move slowly and which will occasionally throw balls at the 
+player. The player can also throw balls, but only in the direction 
+they are facing. If all enemies are hit, the player can move to the 
+unlocked platform and earn a significant level completion bonus.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press. 
+
+The different combos are:
+
+| Num | Combo        | Action              |
+|-----|--------------|---------------------|
+| 0   | LEFT + DOWN  | Move left and down  |
+| 1   | LEFT         | Move left           |
+| 2   | LEFT + UP    | Move left and up    |
+| 3   | DOWN         | Move down           |
+| 4   |              | Do nothing          |
+| 5   | UP           | Move up             |
+| 6   | RIGHT + DOWN | Move right and down |
+| 7   | RIGHT        | Move right          |
+| 8   | RIGHT + UP   | Move right and up   |
+| 9   | D            | Throw ball          |
+| 10  | A            | Unused              |
+| 11  | W            | Unused              |
+| 12  | S            | Unused              |
+| 13  | Q            | Unused              |
+| 14  | E            | Unused              |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent 
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the 
+observation space is a dictionary space where the pixels are under 
+the key "rgb".
+
+### Rewards
+
+A `+2` reward is given for each enemy hit. A further `+10` is 
+assigned after moving to the unlocked goal platform.
+
+### Termination
+
+The episode ends if the player collides with one of the following:
+
+1. An enemy
+2. An enemy ball
+3. A wall
+4. The final platform after all the enemies are erased
+*/
 class DodgeballGame : public BasicAbstractGame {
   public:
     std::vector<QRectF> rooms;

@@ -22,6 +22,70 @@ const int ENEMY3 = 8;
 const int MARKER = 1001;
 const int ORB = 1002;
 
+/**
+### Description
+
+Inspired by the Atari game “MsPacman”. Maze layouts are generated
+using Kruskal’s algorithm, and then walls are removed until no 
+dead-ends remain in the maze. The player must collect all the green 
+orbs. 3 large stars spawn that will make enemies vulnerable for a 
+short time when collected. A collision with an enemy that isn’t 
+vulnerable results in the player’s death. When a vulnerable enemy is
+eaten, an egg spawns somewhere on the map that will hatch into a new 
+enemy after a short time, keeping the total number of enemies 
+constant. The player receives a small reward for collecting each orb
+and a large reward for completing the level.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move down-left  |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move up-left    |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move down-right |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move up-right   |
+| 9   | D            | Unused          |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+0.04` reward is given for each orb eaten.
+A further `+10` is assigned after succesfully completing one
+episode.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player collide with an enemy.
+2. The player complete the level by eating all the orbs.
+3. Timeout is reached.
+
+*/
+
 class ChaserGame : public BasicAbstractGame {
   public:
     std::shared_ptr<MazeGen> maze_gen;

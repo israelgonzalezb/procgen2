@@ -24,6 +24,65 @@ float sign(float x) {
     return x > 0 ? +1 : (x == 0 ? 0 : -1);
 }
 
+/**
+### Description
+
+Inspired by the classic game “Frogger”. The player must cross several lanes to 
+reach the finish line and earn a reward. The first group of lanes contains cars 
+which must be avoided. The second group of lanes contains logs on a river. The 
+player must hop from log to log to cross the river. If the player falls in the 
+river, the episode ends.
+
+### Action Space
+
+The action space is `Discrete(15)` for which button combo to press.
+The button combos are defined in [`env.py`](procgen/env.py).
+
+The different combos are:
+
+| Num | Combo        | Action          |
+|-----|--------------|-----------------|
+| 0   | LEFT + DOWN  | Move left       |
+| 1   | LEFT         | Move left       |
+| 2   | LEFT + UP    | Move left       |
+| 3   | DOWN         | Move down       |
+| 4   |              | Do Nothing      |
+| 5   | UP           | Move up         |
+| 6   | RIGHT + DOWN | Move right      |
+| 7   | RIGHT        | Move right      |
+| 8   | RIGHT + UP   | Move right      |
+| 9   | D            | Unused          |
+| 10  | A            | Unused          |
+| 11  | W            | Unused          |
+| 12  | S            | Unused          |
+| 13  | Q            | Unused          |
+| 14  | E            | Unused          |
+
+### Observation Space
+
+The observation space is a box space with the RGB pixels the agent
+sees in an `ndarray` of shape `(64, 64, 3)` with dtype `uint8`.
+
+**Note**: If you are using the vectorized environment, the
+observation space is a dictionary space where the pixels are under
+the key "rgb".
+
+### Rewards
+
+A `+10` reward is assigned after succesfully completing one
+episode by reaching the finish line.
+
+### Termination
+
+The episode ends if any one of the following conditions is met:
+
+1. The player collides with a car.
+2. The player fell in the river.
+3. The player reaches the finish line.
+4. Timeout is reached.
+
+*/
+
 class LeaperGame : public BasicAbstractGame {
   public:
     int bottom_road_y = 0;
